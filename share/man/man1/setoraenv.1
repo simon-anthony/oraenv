@@ -13,7 +13,7 @@ setoraenv \- set environment for database access
 .SH SYNOPSIS
 \f3. /etc/profile.d/setoraenv.sh\f1
 .sp
-\f3setoraenv\f1 [\f3-l\f1] [\f3-i\f1[\f3-u\f1]|-s \f2oracle_sid\f1 [\f3-e\f1[\f3-o\f1][\f3-w\f1]]
+\f3setoraenv\f1 [\f3-l\f1] [\f3-i\f1[\f3-u\f1]|-s \f2oracle_sid\f1 [\f3-e\f1[\f3-o\f1][\f3-w\f1[\f3-x\f1]]]
 .SH DESCRIPTION
 .IX "setoraenv"
 .sp
@@ -86,6 +86,11 @@ precedence.
 Write a copy of the environment settings from the original \f6envfile\f1 (with
 possible modifications made by \f3oraenv\f1) to
 the home directory of the current user.
+.TP
+\f3-x\f1
+In the script created when using \f3-w\f1 append \f5export \f2var\f1 to each
+assignment. Ordinarily it might be expected to use the shell to mark the
+assigments for export with \f3set -a\f1 before sourcing the file.
 .SH FILES
 .TP 30
 \f5/etc/oratab\f1
@@ -99,6 +104,10 @@ Default location for \f3oraenv\f1 program.
 .TP 30
 \f5/usr/local/bin/dbhome\f1
 Default location for \f3dbhome\f1 program.
+.SH ENVIRONMENT
+.TP 10 
+ENVDIR
+Location for .env files. Default is @PKGDATADIR@.
 .SH EXAMPLES
 Set the environment for the named database and write an \f5envfile\f1:
 .nf

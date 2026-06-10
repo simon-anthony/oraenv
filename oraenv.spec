@@ -70,6 +70,7 @@ mv %{_bindir}/dbhome.bak %{_bindir}/dbhome
 %{_bindir}/coraenv
 %attr(4750,oracle,oinstall)      %{_bindir}/oratab
 %{_sysconfdir}/profile.d/*
+%attr(0644,root,root)			%{_datadir}/%{_package}/example/*
 %{_mandir}/man?/*
 
 

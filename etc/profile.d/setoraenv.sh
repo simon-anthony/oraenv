@@ -37,21 +37,21 @@ readoraenv() {
 
 writeoraenv() {
 	typeset -r prog="writeoraenv"
-	local eflg= fflg= opt= errflg= OPTIND=1
+	local eflg= xflg= opt= errflg= OPTIND=1
 	local var= val=
 
-	while getopts "ef" opt 2>&-
+	while getopts "ex" opt 2>&-
 	do
 		case $opt in
 		e)	eflg=y ;;
-		f)	fflg=y ;;
+		x)	xflg=y ;;
 		\?)	errflg=y
 		esac
 	done
 	shift $(( OPTIND - 1 )) 
 
 	[ $# -eq 1 ] || errflg=y
-	[ $errflg ] && { echo "usage: $prog [-e] <file>" >&2; return 2; }
+	[ $errflg ] && { echo "usage: $prog [-ex] <file>" >&2; return 2; }
 
 	local envfile=$HOME/`basename $1` 
 
@@ -63,9 +63,9 @@ writeoraenv() {
 	do
 		if [ $eflg ]
 		then
-			eval echo $var=\$$var ${fflg:+export $var} | tee -a $envfile
+			eval echo $var=\$$var ${xflg:+export $var} | tee -a $envfile
 		else
-			eval echo $var=$val ${fflg:+export $var} | tee -a $envfile
+			eval echo $var=$val ${xflg:+export $var} | tee -a $envfile
 		fi
 	done < <(sed -n '/^[A-Z_]\{1,\}=/ {
 		s;\([^=]*\)="\([^"]*\)";\1="";
@@ -75,13 +75,13 @@ writeoraenv() {
 
 setoraenv() {
 	typeset -r prog="setoraenv"
-	local iflg= uflg= sflg= lflg= eflg= oflg= wflg= opt= errflg= OPTIND=1
+	local iflg= uflg= sflg= lflg= eflg= oflg= wflg= xflg= opt= errflg= OPTIND=1
 	local oracle_sid=
-	local envdir="${ENVDIR:-/etc/opt/oracle/env}"
+	local envdir="${ENVDIR:-@PKGDATADIR@}"
 	local envfile=
 	local suffix="env"
 	
-	while getopts "ius:leow" opt 2>&-
+	while getopts "ius:leowx" opt 2>&-
 	do
 		case $opt in
 		i)	iflg=y
@@ -102,6 +102,8 @@ setoraenv() {
 			;;
 		w)	wflg=y	# write resulting envfile 
 			;;
+		x)	xflg=y	# add export to script
+			;;
 		\?)	errflg=y
 		esac
 	done
@@ -112,8 +114,9 @@ setoraenv() {
 	[ -n "$eflg" -a -z "$sflg" ] && errflg=y # -e requires -s
 	[ -n "$wflg" -a -z "$eflg" ] && errflg=y # -w requires -e 
 	[ -n "$oflg" -a -z "$eflg" ] && errflg=y # -o requires -e 
+	[ -n "$xflg" -a -z "$wflg" ] && errflg=y # -x requires -w 
 
-	[ $errflg ] && { echo "usage: $prog [-l] [-i[-u]|-s <sid> [-e[-o][-w]]" >&2; return 2; }
+	[ $errflg ] && { echo "usage: $prog [-l] [-i[-u]|-s <sid> [-e[-o][-w[-x]]]" >&2; return 2; }
 
 	local oratab=`ls /etc/oratab /var/opt/oracle/oratab 2>&-`
 
@@ -137,7 +140,11 @@ setoraenv() {
 		oracle_sid=`awk -F: '$1 == "'$oracle_sid'" { printf("%s", $1); quit; }' $oratab`
 		if [ "$envfile" ]
 		then
-			envfile=`grep -l ORACLE_SID=''$oracle_sid'[\ ;$]' $envdir/*.$suffix`
+			envfile=`grep -s -l ORACLE_SID=''$oracle_sid'[\ ;$]' $envdir/*.$suffix`
+			case $? in
+			1) echo "no environment file containing ORACLE_SID='$oracle_sid'" >&2; wflg= ;;
+			2) echo "no environment files found" >&2; wflg= ;;
+			esac
 			if [ "${envfile#*.$suffix}" ] # too many matches
 			then
 				echo "ORACLE_SID '$oracle_sid' found in too many files: $envfile" >&2
@@ -158,7 +165,7 @@ setoraenv() {
 		echo "$prog: specified SID not in $oratab"
 		return 1
 	fi
-	[ $wflg ] && writeoraenv ${oflg:+-e} $envfile
+	[ $wflg ] && writeoraenv ${oflg:+-e} ${xflg:+-x} $envfile
 	if [ ! "$lflg" ]
 	then
 		# ORACLE_SID is only for local instances with BEQ connection
