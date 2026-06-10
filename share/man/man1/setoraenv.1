@@ -1,0 +1,184 @@
+.\" vim:ts=4:sw=4:syntax=nroff
+.fp 1 R
+.fp 2 I
+.fp 3 B
+.fp 4 BI
+.fp 5 CO
+.fp 6 CI
+.fp 7 CB
+.nr X
+.TH setoraenv 1 "9 Jun 2026" ""
+.SH NAME
+setoraenv \- set environment for database access
+.SH SYNOPSIS
+\f3. /etc/profile.d/setoraenv.sh\f1
+.sp
+\f3setoraenv\f1 [\f3-l\f1] [\f3-i\f1[\f3-u\f1]|-s \f2oracle_sid\f1 [\f3-e\f1[\f3-o\f1][\f3-w\f1]]
+.SH DESCRIPTION
+.IX "setoraenv"
+.sp
+.P
+\f3setoraenv\f1 uses \f3oraenv\f1 to set the current shell environment with approriate values for a valid \f3ORACLE_HOME\f1.
+.P
+.SH OPTIONS
+.TP
+\f3-l\f1
+Consider the ORACLE_SID local. That is a valid ORACLE_HOME must be present for
+the BEQ adapater to be applicable.
+.TP
+\f3-i\f1
+Interactively select an instance from a menu built from the contents of the oratab.
+.IP
+For example:
+.DS
+.sp
+.nf
+\f1$ \f3setoraenv -i\f1
+
+  1  FOO        /opt/oracle/product/19c/dbhome
+  2  agent      /opt/oracle/product/13c/agent/agent_13.5.0.0.0
+  3  aiorcl     /opt/oracle/product/26ai/dbhome
+  4  oms        /opt/oracle/product/24ai/mw/oms_home
+  5  orcl       /opt/oracle/product/19c/dbhome
+
+Choose an instance [?,??,q]:
+.fi
+.DE
+.TP
+\f3-u\f1
+Do not sort the interactive menu generated with \f3-i\f1.
+.TP
+\f3-s \f2oracle_sid\f1
+Supply an ORACLE_SID for \f3oraenv\f1 to set the environment.
+.TP
+\f3-e\f1
+Set additional environment variables read from a file, \f6envfile\f1, to be found in a directory defined by the environment variable \f5ENVDIR\f1 (or a default location).
+.IP
+This file is typically named \f2oracle_sid\f3.env\f1, however, using \f2oracle_sid\f1 is not mandatory since the key:
+.DS
+.nf
+.sp
+ \f5ORACLE_SID=\f1
+.fi
+.DE
+.IP 
+is used to locate the file. There must be only one such \f5ORACLE_SID=\f1 entry in all files located in \f5ENVDIR\f1.
+.IP
+This file has the format:
+.DS
+.sp
+.nf
+ \f2VAR1\f1=\f2value1\f1
+ \f2VAR2\f1=\f2value2\f1
+ \f2VAR3\f1=\f2value3\f1
+ ...
+.fi
+.DE
+.IP
+Lines starting with '#' are comments. Blank lines will also be ignored.
+.TP
+\f3-o\f1
+When setting the environment any settings in the \f6envfile\f1 will override those
+made by \f3oraenv\f1. This flag ensures that the \f3oraenv\f1 settings take
+precedence.
+.TP
+\f3-w\f1
+Write a copy of the environment settings from the original \f6envfile\f1 (with
+possible modifications made by \f3oraenv\f1) to
+the home directory of the current user.
+.SH FILES
+.TP 30
+\f5/etc/oratab\f1
+oratab file on Linux systems
+.TP 30
+\f5/etc/opt/oracle/env\f1
+Default location for environment files.
+.TP 30
+\f5/usr/local/bin/oraenv\f1
+Default location for \f3oraenv\f1 program.
+.TP 30
+\f5/usr/local/bin/dbhome\f1
+Default location for \f3dbhome\f1 program.
+.SH EXAMPLES
+Set the environment for the named database and write an \f5envfile\f1:
+.nf
+
+\f5$ \f3setoraenv -s FOO -e -w\f1\f5
+The Oracle base has been changed from /u02/app/oracle to /var/opt/oracle/dbhome
+writing /export/home/oracle/foo.env...
+PATH=/usr/bin:/usr/local/bin export PATH
+ORACLE_UNQNAME=FOO
+ORACLE_SID=FOO
+ORACLE_HOSTNAME=oel.ipa.home
+LD_LIBRARY_PATH=/opt/oracle/product/19c/dbhome/lib
+ORACLE_BASE=/u02/app/oracle
+OH=/opt/oracle/product/19c/dbhome
+ORACLE_HOME=/opt/oracle/product/19c/dbhome
+TNS_ADMIN=/etc/opt/oracle/network/admin\f1
+.fi
+.P
+The same, except with settings made by \f3oraenv\f1 taking precedence:
+.nf
+\f5$ \f3setoraenv -s FOO -e -w -o\f1\f5
+The Oracle base has been changed from /u02/app/oracle to /var/opt/oracle/dbhome
+writing /export/home/oracle/foo.env...
+PATH=/usr/bin:/usr/local/bin:/opt/oracle/product/19c/dbhome/bin
+ORACLE_UNQNAME=FOO
+ORACLE_SID=FOO
+ORACLE_HOSTNAME=oel.ipa.home
+LD_LIBRARY_PATH=/opt/oracle/product/19c/dbhome/lib
+ORACLE_BASE=/var/opt/oracle/dbhome
+OH=/opt/oracle/product/19c/dbhome
+ORACLE_HOME=/opt/oracle/product/19c/dbhome
+TNS_ADMIN=/opt/oracle/product/19c/dbhome/network/admin
+.fi
+.SH AUTHOR
+Simon Anthony(simon.a.anthony@oracle.com)
+.SH SEE ALSO
+.BR bash (1)
+.SH NOTES
+.P
+The use of the \f3-i\f1 options requires the System V valtools to be
+installed.
+.P
+In the examples given above the following variables need not be set as they
+are set by \f3oraenv\f1:
+.nf
+.fi
+.TP 16
+LD_LIBRARY_PATH
+Unless additional shared objects for other programs need to be found
+.TP 16
+ORACLE_BASE
+Set by \f3oraenv\f1
+.TP 16
+ORACLE_HOME
+Set by \f3oraenv\f1
+.TP 16
+OH
+This is the same as \f5ORACLE_HOME\f1 and could be set in the "custom" section
+of \f3oratab\f1 if required - see the note below.
+.P
+In addition, there are other cases where, for example, some users should have
+different settings for a variable.
+.P
+This is demonstrated in the above example:
+.TP 16
+TNS_ADMIN
+Is set by \f3oraenv\f1 in its "custom" section:
+.DS
+.nf
+.sp
+#
+# Install any "custom" code here
+#
+export TNS_ADMIN=$ORACLE_HOME/network/admin
+.fi
+.DE
+.IP 
+The use of \f3-o\f1 determines which setting of TNS_ADMIN is set in the
+environment or written to the local file.
+.IP
+The directory \f5/usr/local/bin\f1 containing \f3oraenv\f1 and \f3dbhome\f1
+must be in the \f5PATH\f1 of the current shell as \f3setoraenv\f1 is a shell
+function and does not set its own environment.
