@@ -23,12 +23,10 @@ values for `ORACLE_SID` and, to avoid prompting, `ORAENV_ASK`:
 
 This file is located as `/etc/oratab` or `var/opt/oracle/oratab`.
 
-It has the format:
+It consists of repeated entries of the form:
 
-```console
-*ORACLE_SID*:*ORACLE_HOME*:*start_flag*
-...
-```
+	*ORACLE_SID*:*ORACLE_HOME*:*start_flag*
+
 For example:
 
 ```console
