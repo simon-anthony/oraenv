@@ -28,8 +28,7 @@ It has the format:
 ```console
 *ORACLE_SID*:*ORACLE_HOME*:*start_flag*
 ...
-```console
-
+```
 For example:
 
 ```console
