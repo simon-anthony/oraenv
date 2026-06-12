@@ -21,7 +21,9 @@ values for `ORACLE_SID` and, to avoid prompting, `ORAENV_ASK`:
 
 ### oratab
 
-This file is located as `/etc/oratab` or `var/opt/oracle/oratab`.
+This file is located as `/etc/oratab` or `var/opt/oracle/oratab` and is used
+by the `oraenv` script to determine the `ORACLE_HOME` for a respective
+`ORACLE_SID`.
 
 It consists of repeated entries of the form:
 
@@ -39,14 +41,14 @@ The *dbstart* program uses the oratab in the folowing way:
 
 This script will start all databases listed in the oratab file
 whose third field is a `"Y"`.  If the third field is set to `"Y"` and
-there is no `ORACLE_SID` for an entry (the first field is a `\*`),
+there is no `ORACLE_SID` for an entry (the first field is a `*`),
 then this script will ignore that entry.
 
 This script requires that ASM `ORACLE_SID`s start with a `+`, and
 that non-ASM instance `ORACLE_SID`s do not start with a `+`.
 
 If ASM instances are to be started with this script, it cannot
-be used inside an `rc\*.d` directory, and should be invoked from
+be used inside an `rc*.d` directory, and should be invoked from
 `rc.local` only. Otherwise, the CSS service may not be available
 yet, and this script will block init from completing the boot
 cycle.
@@ -65,7 +67,7 @@ It should ONLY be executed as part of the system boot procedure.
 
 This script will shutdown all databases listed in the oratab file
 whose third field is a `"Y"` or `"W"`.  If the third field is set to `"Y"` and
-there is no ORACLE_SID for an entry (the first field is a `\*`),
+there is no `ORACLE_SID` for an entry (the first field is a `*`),
 then this script will ignore that entry.
 
 This script requires that ASM `ORACLE_SID`s start with a `+`, and 
