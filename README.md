@@ -226,7 +226,8 @@ a254d09 First commit
 You don't need to run these if you use the build script, however, these are
 shown for completeness.  The build script completes the following steps.
 
-Create the build directories:
+Create the build directories using the value for _topdir_ as configured in
+`$HOME/.rpmmacros`:
 
 <pre><code>for dir in BUILD BUILDROOT RPMS SOURCES SPECS SRPMS
 do
@@ -261,7 +262,7 @@ Finally, build the package:
 
 The RPM file will be created at:
 
-<pre>%\_topdir/RPMS/noarch/@PACKAGE@-<i>m</i>.<i>n</i>-<i>r</i>.el9.noarch.rpm</pre>
+<pre>%_topdir/RPMS/noarch/@PACKAGE@-<i>m</i>.<i>n</i>-<i>r</i>.el9.noarch.rpm</pre>
 
 
 ## Installing from a Tar Bundle
