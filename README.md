@@ -284,7 +284,7 @@ If desired to specify an installation destination other than `/usr/local` do so
 with the usual configure mechanism:
 
 ```
-./configure --prefix=/opt/OEMtools 
+./configure --prefix=/opt/otools 
 ```
 
 Build the software:
@@ -299,16 +299,9 @@ Ensure that the *bindir* path derived from the install *prefix* in the `configur
 step is available in the `PATH` environment variable. Using the previous example where the default of `/usr/local/bin` is not chosen:
 
 <pre>
-PATH=$PATH:/opt/OEMtools/bin
+PATH=$PATH:/opt/otools/bin
 </pre>
 
 ## Authors
 
 * **Simon Anthony** - *Initial work* - * [Simon Anthony](https://github.com/simon-anthony)
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
-
-## Acknowledgments
-
